@@ -18,7 +18,8 @@ public class SessionHandler : Handler
         try
         {
             var userDto = JsonSerializer.Deserialize<UserDto>(e.Payload);
-            if (userDto == null) return (HttpStatusCode.BAD_REQUEST, CreateErrorReply("Invalid request."));
+            if (userDto == null) 
+                return BadRequest("Invalid request.");
 
             var (Success, Token) = User.Logon(
                 userDto.Username,
@@ -27,23 +28,14 @@ public class SessionHandler : Handler
 
             if (Success)
             {
-                return (HttpStatusCode.OK, new JsonObject 
-                { 
-                    ["success"] = true,
-                    ["message"] = "User logged in successfully.",
-                    ["token"] = Token 
-                });
+                return TokenOk(Token, "User logged in successfully.");
             }
 
-            return (HttpStatusCode.UNAUTHORIZED, new JsonObject 
-            { 
-                ["success"] = false,
-                ["message"] = "Invalid username/password." 
-            });
+            return Unauthorized("Invalid username/password.");
         }
         catch (Exception)
         {
-            return (HttpStatusCode.BAD_REQUEST, CreateErrorReply("Invalid request."));
+            return BadRequest("Invalid request.");
         }
     }
 }

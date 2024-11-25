@@ -1,4 +1,3 @@
-using System.Net;
 using System.Reflection;
 using System.Text.Json.Nodes;
 using System.Text.Json;
@@ -14,7 +13,8 @@ public class UserHandler : Handler
         try
         {
             var userDto = JsonSerializer.Deserialize<UserDto>(e.Payload);
-            if (userDto == null) return (HttpStatusCode.BAD_REQUEST, null);
+            if (userDto == null) 
+                return BadRequest("Invalid request.");
 
             User.Create(
                 userDto.Username,
@@ -23,27 +23,15 @@ public class UserHandler : Handler
                 userDto.Email
             );
 
-            return (HttpStatusCode.OK, new JsonObject 
-            { 
-                ["success"] = true,
-                ["message"] = "User created."
-            });
+            return Ok("User created.");
         }
         catch (UserException ex)
         {
-            return (HttpStatusCode.BAD_REQUEST, new JsonObject 
-            { 
-                ["success"] = false,
-                ["message"] = ex.Message 
-            });
+            return BadRequest(ex.Message);
         }
         catch (Exception)
         {
-            return (HttpStatusCode.BAD_REQUEST, new JsonObject 
-            { 
-                ["success"] = false,
-                ["message"] = "Invalid request." 
-            });
+            return BadRequest("Invalid request.");
         }
     }
 
@@ -54,11 +42,7 @@ public class UserHandler : Handler
         
         if (!Success)
         {
-            return (HttpStatusCode.UNAUTHORIZED, new JsonObject 
-            { 
-                ["success"] = false,
-                ["message"] = "Unauthorized." 
-            });
+            return Unauthorized();
         }
 
         var userDto = new UserDto
@@ -68,10 +52,6 @@ public class UserHandler : Handler
             Email = User.EMail
         };
 
-        return (HttpStatusCode.OK, new JsonObject
-        {
-            ["success"] = true,
-            ["data"] = JsonSerializer.SerializeToNode(userDto)
-        });
+        return Ok(userDto);
     }
 }

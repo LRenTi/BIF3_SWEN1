@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Nodes;
+using System.Text.Json;
+using MTCG.Models;
 
 namespace MTCG;
 
@@ -81,9 +83,18 @@ namespace MTCG;
             return false;
         }
 
-        protected static JsonObject CreateErrorReply(string message) => new()
-        {
-            ["success"] = false,
-            ["message"] = message
-        };
+        protected (int Status, JsonObject? Reply) Ok<T>(T data) => 
+            (HttpStatusCode.OK, JsonSerializer.SerializeToNode(ApiResponseDto<T>.SuccessResponse(data))?.AsObject());
+
+        protected (int Status, JsonObject? Reply) Ok(string message) => 
+            (HttpStatusCode.OK, JsonSerializer.SerializeToNode(ApiResponseDto<object>.SuccessResponse(message))?.AsObject());
+
+        protected (int Status, JsonObject? Reply) TokenOk(string token, string message) => 
+            (HttpStatusCode.OK, JsonSerializer.SerializeToNode(ApiResponseDto<object>.TokenResponse(token, message))?.AsObject());
+
+        protected (int Status, JsonObject? Reply) BadRequest(string message) => 
+            (HttpStatusCode.BAD_REQUEST, JsonSerializer.SerializeToNode(ApiResponseDto<object>.ErrorResponse(message))?.AsObject());
+
+        protected (int Status, JsonObject? Reply) Unauthorized(string message = "Unauthorized") => 
+            (HttpStatusCode.UNAUTHORIZED, JsonSerializer.SerializeToNode(ApiResponseDto<object>.ErrorResponse(message))?.AsObject());
     }
