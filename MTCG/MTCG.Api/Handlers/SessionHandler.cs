@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Text.Json;
+using MTCG.Models;
 
 namespace MTCG;
 
@@ -15,12 +17,12 @@ public class SessionHandler : Handler
     {
         try
         {
-            JsonNode? json = JsonNode.Parse(e.Payload);
-            if (json == null) return (HttpStatusCode.BAD_REQUEST, CreateErrorReply("Invalid request."));
+            var userDto = JsonSerializer.Deserialize<UserDto>(e.Payload);
+            if (userDto == null) return (HttpStatusCode.BAD_REQUEST, CreateErrorReply("Invalid request."));
 
             var (Success, Token) = User.Logon(
-                (string)json["username"]!,
-                (string)json["password"]!
+                userDto.Username,
+                userDto.Password
             );
 
             if (Success)
