@@ -10,6 +10,9 @@ using MTCG.Models;
 
 namespace MTCG;
 
+/// <summary>
+/// This class handles session-related requests.
+/// </summary>
 public class SessionHandler : Handler
 {
     [Route("POST", "sessions")]

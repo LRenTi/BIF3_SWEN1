@@ -2,6 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace MTCG.Models;
 
+
+/// <summary>
+/// This class represents a user.
+/// </summary>
 public class UserDto
 {
     [JsonPropertyName("username")]

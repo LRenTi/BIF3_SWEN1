@@ -2,6 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace MTCG.Models;
 
+/// <summary>
+/// This class defines the structure of an API response.
+/// </summary>
 public class ApiResponseDto<T>
 {
     [JsonPropertyName("success")]

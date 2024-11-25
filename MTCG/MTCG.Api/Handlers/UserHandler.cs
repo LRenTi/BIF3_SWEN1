@@ -5,6 +5,9 @@ using MTCG.Models;
 
 namespace MTCG;
 
+/// <summary>
+/// This class handles user-related requests.
+/// </summary>
 public class UserHandler : Handler
 {
     [Route("POST", "users")]
