@@ -5,11 +5,9 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-using MTCG.Exceptions;
+namespace MTCG;
 
-namespace MTCG
-{
-    public class SessionHandler: Handler, IHandler
+    public class SessionHandler: Handler
     {
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // [override] Handler                                                                                               //
@@ -59,4 +57,3 @@ namespace MTCG
             return false;
         }
     }
-}

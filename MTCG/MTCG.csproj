@@ -7,4 +7,11 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="MCTG.Core\Utlis\" />
+      <Folder Include="MCTG.Data\Contexts\" />
+      <Folder Include="MCTG.Tests\" />
+      <Folder Include="MTCG.Api\Models\" />
+    </ItemGroup>
+
 </Project>

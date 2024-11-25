@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This class contains the main entry point of the application.</summary>
     internal class Program
     {
@@ -18,9 +17,7 @@ namespace MTCG
 
             svr.Run();
         }
-
-
-
+        
         private static void Svr_Incoming(object sender, HttpSvrEventArgs e)
         {
             Handler.HandleEvent(e);
@@ -40,4 +37,3 @@ namespace MTCG
             */
         }
     }
-}

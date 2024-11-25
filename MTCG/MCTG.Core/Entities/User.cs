@@ -2,10 +2,7 @@ using System;
 using System.Security;
 using System.Security.Authentication;
 
-using MTCG.Exceptions;
-
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This class represents a user.</summary>
     public sealed class User
     {
@@ -54,6 +51,10 @@ namespace MTCG
         } = string.Empty;
 
 
+        /// <summary>Gets the password hash.</summary>
+        private string PasswordHash { get; set; } = string.Empty;
+
+
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // public methods                                                                                                   //
@@ -99,6 +100,7 @@ namespace MTCG
             User user = new()
             {
                 UserName = userName,
+                PasswordHash = HashPassword(password),
                 FullName = fullName,
                 EMail = eMail
             };
@@ -115,12 +117,25 @@ namespace MTCG
         ///          otherwise success flag is FALSE and token is empty.</returns>
         public static (bool Success, string Token) Logon(string userName, string password)
         {
-            if(_Users.ContainsKey(userName))
+            if(_Users.TryGetValue(userName, out User? user))
             {
-                return (true, Token._CreateTokenFor(_Users[userName]));
+                if(VerifyPassword(password, user.PasswordHash))
+                {
+                    return (true, Token._CreateTokenFor(user));
+                }
             }
-
             return (false, string.Empty);
         }
+
+        private static string HashPassword(string password)
+        {
+            // Vereinfachte Version - in Produktion sollte ein richtiger Hash-Algorithmus verwendet werden
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password));
+        }
+
+        private static bool VerifyPassword(string password, string hash)
+        {
+            // Vereinfachte Version - muss mit dem Hash-Algorithmus oben übereinstimmen
+            return hash == HashPassword(password);
+        }
     }
-}

@@ -3,8 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This class implements a HTTP server.</summary>
     public sealed class HttpSvr
     {
@@ -75,4 +74,3 @@ namespace MTCG
             Active = false;
         }
     }
-}

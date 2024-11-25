@@ -12,3 +12,4 @@
 /Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.pdb
 /Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.genruntimeconfig.cache
 /Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/ref/MTCG.dll
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.sourcelink.json

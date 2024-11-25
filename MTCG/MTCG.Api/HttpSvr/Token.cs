@@ -1,9 +1,6 @@
 using System;
 
-
-
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This class provides methods for the token-based security.</summary>
     public static class Token
     {
@@ -86,4 +83,3 @@ namespace MTCG
             return (false, null);
         }
     }
-}

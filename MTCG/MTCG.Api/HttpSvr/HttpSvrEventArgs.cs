@@ -2,8 +2,7 @@ using System;
 using System.Net.Sockets;
 using System.Text;
 
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This class defines event arguments for the <see cref="HttpSvrEventHandler"/> event handler.</summary>
     public class HttpSvrEventArgs: EventArgs
     {
@@ -142,4 +141,3 @@ namespace MTCG
             _Client.Dispose();
         }
     }
-}

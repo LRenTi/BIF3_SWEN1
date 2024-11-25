@@ -1,7 +1,7 @@
 using System;
 
-namespace MTCG.Exceptions
-{
+namespace MTCG;
+
     /// <summary>This class represents a user-specific exception.</summary>
     public class UserException : Exception
     {
@@ -19,4 +19,3 @@ namespace MTCG.Exceptions
         public UserException(string message) : base(message)
         {}
     }
-}

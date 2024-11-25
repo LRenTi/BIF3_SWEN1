@@ -1,7 +1,6 @@
 using System;
 
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This enumeration defines HTTP status codes that are used by
     ///          the <see cref="HttpSvr"/> implementation.</summary>
     public static class HttpStatusCode
@@ -18,4 +17,3 @@ namespace MTCG
         /// <summary>Status code NOT FOUND.</summary>
         public const int NOT_FOUND = 404;
     }
-}

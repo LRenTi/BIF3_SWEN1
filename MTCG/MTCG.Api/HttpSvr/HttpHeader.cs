@@ -1,7 +1,6 @@
 using System;
 
-namespace MTCG
-{
+namespace MTCG;
     /// <summary>This class represents a HTTP header.</summary>
     public class HttpHeader
     {
@@ -43,4 +42,3 @@ namespace MTCG
             get; protected set;
         }
     }
-}
