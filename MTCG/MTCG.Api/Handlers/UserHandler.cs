@@ -11,7 +11,7 @@ namespace MTCG;
 
     public class UserHandler : Handler, IHandler
     {
-        [Route("users", "POST")]
+        [Route("POST","users")]
         private (int Status, JsonObject? Reply) CreateUser(HttpSvrEventArgs e)
         {
             try
@@ -50,7 +50,7 @@ namespace MTCG;
             }
         }
 
-        [Route("users/me", "get")]
+        [Route("GET", "users/me")]
         private (int Status, JsonObject? Reply) GetUserProfile(HttpSvrEventArgs e)
         {
             var (Success, User) = Token.Authenticate(e);
