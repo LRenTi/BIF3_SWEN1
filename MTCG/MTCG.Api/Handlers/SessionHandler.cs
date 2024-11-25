@@ -46,31 +46,4 @@ public class SessionHandler : Handler
             return (HttpStatusCode.BAD_REQUEST, CreateErrorReply("Invalid request."));
         }
     }
-
-    private static JsonObject CreateErrorReply(string message) => new()
-    {
-        ["success"] = false,
-        ["message"] = message
-    };
-
-    public override bool Handle(HttpSvrEventArgs e)
-    {
-        var methods = GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-            .Where(m => m.GetCustomAttribute<RouteAttribute>() != null);
-
-        foreach (var method in methods)
-        {
-            var route = method.GetCustomAttribute<RouteAttribute>()!;
-            var normalizedPath = e.Path.TrimEnd('/', ' ', '\t').TrimStart('/');
-            
-            if (route.Path == normalizedPath && route.Method == e.Method)
-            {
-                var result = ((int Status, JsonObject? Reply))method.Invoke(this, new[] { e })!;
-                e.Reply(result.Status, result.Reply?.ToJsonString());
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

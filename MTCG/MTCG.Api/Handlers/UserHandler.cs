@@ -6,7 +6,7 @@ using MTCG.Models;
 
 namespace MTCG;
 
-public class UserHandler : Handler, IHandler
+public class UserHandler : Handler
 {
     [Route("POST", "users")]
     private (int Status, JsonObject? Reply) CreateUser(HttpSvrEventArgs e)
@@ -73,26 +73,5 @@ public class UserHandler : Handler, IHandler
             ["success"] = true,
             ["data"] = JsonSerializer.SerializeToNode(userDto)
         });
-    }
-
-    public override bool Handle(HttpSvrEventArgs e)
-    {
-        var methods = GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-            .Where(m => m.GetCustomAttribute<RouteAttribute>() != null);
-
-        foreach (var method in methods)
-        {
-            var route = method.GetCustomAttribute<RouteAttribute>()!;
-            var normalizedPath = e.Path.TrimEnd('/', ' ', '\t').TrimStart('/');
-            
-            if (route.Path == normalizedPath && route.Method == e.Method)
-            {
-                var result = ((int Status, JsonObject? Reply))method.Invoke(this, new[] { e })!;
-                e.Reply(result.Status, result.Reply?.ToJsonString());
-                return true;
-            }
-        }
-
-        return false;
     }
 }
