@@ -1,4 +1,4 @@
-namespace MTCG.MTCG.Api.Attributes;
+namespace MTCG;
 
 public class RouteAttribute : Attribute
 {
