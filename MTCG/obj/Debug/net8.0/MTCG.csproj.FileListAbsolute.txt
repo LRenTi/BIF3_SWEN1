@@ -1,0 +1,14 @@
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/bin/Debug/net8.0/MTCG
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/bin/Debug/net8.0/MTCG.deps.json
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/bin/Debug/net8.0/MTCG.runtimeconfig.json
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/bin/Debug/net8.0/MTCG.dll
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/bin/Debug/net8.0/MTCG.pdb
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.GeneratedMSBuildEditorConfig.editorconfig
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.AssemblyInfoInputs.cache
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.AssemblyInfo.cs
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.csproj.CoreCompileInputs.cache
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.dll
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/refint/MTCG.dll
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.pdb
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/MTCG.genruntimeconfig.cache
+/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/obj/Debug/net8.0/ref/MTCG.dll
