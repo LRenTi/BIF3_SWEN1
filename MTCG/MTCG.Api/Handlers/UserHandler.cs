@@ -15,9 +15,17 @@ public class UserHandler : Handler
     {
         try
         {
+
             var userDto = JsonSerializer.Deserialize<UserDto>(e.Payload);
-            if (userDto == null) 
+            if (userDto == null)
+            {
                 return BadRequest("Invalid request.");
+            }
+            
+            if (string.IsNullOrWhiteSpace(userDto.Password))
+            {
+                return BadRequest("Password cannot be empty or whitespace.");
+            }
 
             User.Create(
                 userDto.Username,
@@ -32,12 +40,11 @@ public class UserHandler : Handler
         {
             return BadRequest(ex.Message);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return BadRequest("Invalid request.");
         }
     }
-
     [Route("GET","users/me")]
     private (int Status, JsonObject? Reply) GetUserProfile(HttpSvrEventArgs e)
     {

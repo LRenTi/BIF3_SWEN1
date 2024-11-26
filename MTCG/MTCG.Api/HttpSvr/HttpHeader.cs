@@ -4,9 +4,6 @@ namespace MTCG;
     /// <summary>This class represents a HTTP header.</summary>
     public class HttpHeader
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // constructors                                                                                                     //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         /// <summary>Creates a new instance of this class.</summary>
         /// <param name="header">Raw header string.</param>
@@ -22,12 +19,6 @@ namespace MTCG;
             }
             catch(Exception) {}
         }
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public properties                                                                                                //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         /// <summary>Gets the header name.</summary>
         public string Name

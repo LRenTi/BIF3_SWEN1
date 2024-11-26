@@ -4,11 +4,7 @@ namespace MTCG;
 
     /// <summary>This class represents a user-specific exception.</summary>
     public class UserException : Exception
-    {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // constructors                                                                                                     //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+    { 
         /// <summary>Creates a new instance of this class.</summary>
         public UserException() : base()
         {}

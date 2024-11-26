@@ -1,0 +1,8 @@
+# LATEX
+protokoll/*/*.aux
+protokoll/*/*.bbl
+protokoll/*/*.fdb_latexmk
+protokoll/*/*.fls
+protokoll/*/*.log
+protokoll/*/*.out
+protokoll/*/*.synctex.gz

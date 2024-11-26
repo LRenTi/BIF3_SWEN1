@@ -6,18 +6,9 @@ namespace MTCG;
     /// <summary>This class defines event arguments for the <see cref="HttpSvrEventHandler"/> event handler.</summary>
     public class HttpSvrEventArgs: EventArgs
     {
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // protected members                                                                                                //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
+
         /// <summary>TCP client.</summary>
         protected TcpClient _Client;
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // constructors                                                                                                     //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         /// <summary>Creates a new instance of this class.</summary>
         /// <param name="client">TCP client.</param>
@@ -60,12 +51,6 @@ namespace MTCG;
 
             Headers = headers.ToArray();
         }
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public properties                                                                                                //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         /// <summary>Gets the plain message.</summary>
         public string PlainMessage
@@ -101,15 +86,10 @@ namespace MTCG;
             get; protected set;
         } = string.Empty;
 
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // public methods                                                                                                   //
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         /// <summary>Replies the request</summary>
         /// <param name="status">HTTP Status code.</param>
-        /// <param name="msg">Reply body.</param>
+        /// <param name="body">Reply body.</param>
         public void Reply(int status, string? body = null)
         {
             string data;

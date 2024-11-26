@@ -10,7 +10,7 @@ public class RouteAttribute : Attribute
 
     public RouteAttribute( string method, string path)
     {
-        Path = path.TrimStart('/').TrimEnd('/');
+        Path = path;
         Method = method.ToUpper();
     }
 } 

@@ -8,10 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="MCTG.Core\Utlis\" />
-      <Folder Include="MCTG.Data\Contexts\" />
-      <Folder Include="MCTG.Tests\" />
       <Folder Include="MTCG.Api\Models\" />
+      <Folder Include="MTCG.Core\Utils\" />
+      <Folder Include="MTCG.Data\Context\" />
+      <Folder Include="MTCG.Tests\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     </ItemGroup>
 
 </Project>

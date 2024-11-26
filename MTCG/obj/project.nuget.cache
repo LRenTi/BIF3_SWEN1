@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "4OnyNDIXbuA=",
+  "dgSpecHash": "yKJtkvDJ6PE=",
   "success": true,
   "projectFilePath": "/Users/lorenzrentenberger/development/FH/SWEN1/MTCG/MTCG/MTCG.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/lorenzrentenberger/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

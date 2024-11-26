@@ -22,7 +22,8 @@ public class ApiResponseDto<T>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public T? Data { get; set; }
 
-    // Hilfsmethoden für häufige Antworttypen
+    #region Helpers
+    
     public static ApiResponseDto<T> SuccessResponse(T data) => new()
     {
         Success = true,
@@ -47,4 +48,6 @@ public class ApiResponseDto<T>
         Token = token,
         Message = message
     };
+    
+    #endregion Helpers
 } 

@@ -11,7 +11,8 @@ public class UserDto
     [JsonPropertyName("username")]
     public string Username { get; set; } = string.Empty;
     
-    [JsonIgnore]
+    [JsonPropertyName("password")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Password { get; set; } = string.Empty;
 
     [JsonPropertyName("fullname")]
