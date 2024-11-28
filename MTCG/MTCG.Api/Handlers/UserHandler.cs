@@ -58,6 +58,7 @@ public class UserHandler : Handler
         var userDto = new UserDto
         {
             Username = User!.UserName,
+            Password = null,
             Fullname = User.FullName,
             Email = User.EMail
         };

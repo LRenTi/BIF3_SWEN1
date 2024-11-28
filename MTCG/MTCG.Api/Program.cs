@@ -21,19 +21,5 @@ namespace MTCG;
         private static void Svr_Incoming(object sender, HttpSvrEventArgs e)
         {
             Handler.HandleEvent(e);
-
-            /*
-            Console.WriteLine(e.Method);
-            Console.WriteLine(e.Path);
-            Console.WriteLine();
-            foreach(HttpHeader i in e.Headers)
-            {
-                Console.WriteLine(i.Name + ": " + i.Value);
-            }
-            Console.WriteLine();
-            Console.WriteLine(e.Payload);
-
-            e.Reply(HttpStatusCode.OK, "Yo Baby!");
-            */
         }
     }

@@ -112,7 +112,7 @@ namespace MTCG;
             {
                 data += "Content-Length: 0\n";
             }
-            data += "Content-Type: text/plain\n\n";
+            data += "Content-Type: application/json\n\n";
             if(!string.IsNullOrEmpty(body)) { data += body; }
 
             byte[] buf = Encoding.ASCII.GetBytes(data);

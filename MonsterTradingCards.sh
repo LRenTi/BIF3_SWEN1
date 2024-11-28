@@ -41,11 +41,11 @@ echo .
 echo "### Should fail: ###"
 curl -i -X POST http://localhost:12000/users --header "Content-Type: application/json" -d "{\"username\":\"kienboec\", \"password\":\"daniel\"}"
 echo .
-echo "-> Should return HTTP 4xx - User already exists"
+echo "-> Should return HTTP 400 - User already exists"
 echo .
 curl -i -X POST http://localhost:12000/users --header "Content-Type: application/json" -d "{\"username\":\"kienboec\", \"password\":\"different\"}"
 echo .
-echo "-> Should return HTTP 4xx - User already exists"
+echo "-> Should return HTTP 400 - User already exists"
 echo . 
 echo .
 
@@ -64,6 +64,7 @@ echo .
 echo "-> should return HTTP 200 with generated token for the user"
 echo .
 curl -i -X POST http://localhost:12000/sessions --header "Content-Type: application/json" -d "{\"username\":\"admin\",    \"password\":\"istrator\"}"
+echo .
 echo "-> should return HTTP 200 with generated token for the user"
 echo .
 
@@ -74,6 +75,6 @@ echo "### Should fail: ###"
 echo .
 curl -i -X POST http://localhost:12000/sessions --header "Content-Type: application/json" -d "{\"username\":\"kienboec\", \"password\":\"different\"}"
 echo .
-echo "-> Should return HTTP 4xx - Login failed"
+echo "-> Should return HTTP 400 - Login failed"
 echo .
 echo "### END ###"

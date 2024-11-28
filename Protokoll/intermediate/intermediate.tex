@@ -2,8 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[german]{babel}
 \usepackage{graphicx}
-\usepackage[top=3cm, margin=1cm]{geometry}
-\usepackage{listings}
+\usepackage[top=3cm, margin=1cm, bottom=3cm]{geometry}
 \usepackage{hyperref}
 
 \title{MTCG: Intermediate Protokoll}
@@ -20,62 +19,23 @@ Das Monster Trading Card Game (MTCG) ist eine REST-API Implementierung eines Kar
 \subsection{GIT}
 Link zum Github-Repository: \url{https://github.com/LRenTi/BIF3_SWEN1}
 
-\section{Technische Entscheidungen}
+\section{Architektur und Design}
+Die Architektur der Anwendung basiert auf einen mehrschichtigen Ansatz. Die API-Schicht (MTCG.Api) übernimmt die Bearbeitung von HTTP-Requests und das Routing der Endpunkte. Die Core-Schicht (MTCG.Core) enthält die Geschäftslogik und alle zentralen Entitäten des Spiels. Diese Trennung ermöglicht eine klare Struktur und erleichtert zukünftige Erweiterungen.
 
-\subsection{Architektur}
-Die Anwendung folgt einer dreischichtigen Architektur:
-\begin{itemize}
-    \item API-Schicht (MTCG.Api): Behandelt HTTP-Requests und Routing
-    \item Core-Schicht (MTCG.Core): Enthält die Geschäftslogik und Entitäten
-\end{itemize}
+Ein wesentlicher Bestandteil des Designs ist die Implementierung einer sicheren Authentifizierung. Es wurde ein Token-basiertes System eingeführt, bei dem Tokens als zufällig generierte 24-stellige Zeichenketten erstellt werden. Diese Tokens werden in einem zentralen Speicher verwaltet, was eine effiziente und sichere Handhabung ermöglicht. Zusätzlich wurde für die Passwortsicherheit BCrypt verwendet, um die Passwörter der Benutzer zu hashen.
 
-\subsection{Wichtige Design-Entscheidungen}
-\begin{enumerate}
-    \item \textbf{Token-basierte Authentifizierung}
-    \begin{itemize}
-        \item Implementierung einer einfachen Token-Verwaltung in der Token-Klasse
-        \item Tokens werden im Speicher gehalten (Dictionary<string, User>)
-        \item 24-stellige zufällige Token-Generierung für Sicherheit
-    \end{itemize}
-    
-    \item \textbf{Handler-System}
-    \begin{itemize}
-        \item Verwendung von Attribut-basiertem Routing ([Route])
-        \item Trennung der Logik in spezifische Handler (UserHandler, SessionHandler, etc.)
-        \item Erweiterbar durch das IHandler Interface
-    \end{itemize}
-    
-    \item \textbf{Kartenspiel-Mechanik}
-    \begin{itemize}
-        \item Elementtypen (Wasser, Feuer, Normal) mit Effektivitätsregeln
-        \item Unterscheidung zwischen Monster- und Zauberkarten
-        \item Deck-Limitierung auf 4 Karten
-    \end{itemize}
-\end{enumerate}
+Zur Organisation der API-Endpunkte wurde ein flexibles Handler-System implementiert. Mithilfe von Attribut-basiertem Routing \textbf{[Route]} werden die Endpunkte definiert, während spezifische Handler wie UserHandler oder SessionHandler für die jeweilige Funktionalität zuständig sind. Dies ermöglicht eine klare Trennung der Logik und eine einfache Erweiterbarkeit. Das System ist durch die Einführung eines Interfaces für Handler flexibel gestaltbar und kann ohne großen Aufwand erweitert werden.
+
+\section{Kartenspiel-Mechanik}
+Die Kartenspiel-Mechanik bildet den Kern des Projekts. Karten werden in zwei Kategorien unterteilt: Monsterkarten und Zauberkarten. Die Karten verfügen über unterschiedliche Elementtypen wie Wasser, Feuer oder Normal, die ihre Effektivität in Kämpfen beeinflussen. Die Regeln für die Effektivität orientieren sich an klassischen Elementstärken (z. B. Wasser ist stark gegen Feuer). Jedes Deck ist auf vier Karten begrenzt, um strategische Entscheidungen der Spieler zu fördern und den Spielfluss zu verbessern.
 
 \section{Herausforderungen und Lösungen}
-
-\subsection{Authentifizierung}
-\textbf{Problem:} Sichere Benutzerauthentifizierung implementieren\\
-\textbf{Lösung:} 
-\begin{itemize}
-    \item BCrypt für Passwort-Hashing
-    \item Token-basierte Authentifizierung für API-Zugriffe
-    \item Zentrale Token-Verwaltung
-\end{itemize}
-
-\subsection{API-Design}
-\textbf{Problem:} Strukturierte und erweiterbare API-Endpunkte\\
-\textbf{Lösung:}
-\begin{itemize}
-    \item Handler-basierte Architektur mit Attribut-Routing
-    \item Standardisierte API-Responses mit ApiResponseDto
-    \item Klare Trennung von Modellen und DTOs
-\end{itemize}
+Eine der größten Herausforderungen war die sichere Implementierung der Benutzerauthentifizierung. Hierfür wurde ein Token-basiertes System entwickelt, das es ermöglicht, API-Zugriffe eindeutig zu authentifizieren. Die Verwendung von BCrypt für das Hashing der Passwörter gewährleistet zusätzlichen Schutz vor unbefugtem Zugriff. Die zentrale Verwaltung der Tokens sorgt zudem für eine effiziente Verarbeitung und einfache Wartung.
+Ein weiteres Problem war die Entwicklung einer strukturierten und erweiterbaren API. Dieses wurde durch ein handlerbasiertes System gelöst, das Attribut-Routing verwendet. Dadurch können neue Endpunkte leicht hinzugefügt werden, während die Trennung von Modellen und Data Transfer Objects (DTOs) die Übersichtlichkeit der Architektur bewahrt. Zudem wurden standardisierte API-Antworten eingeführt, um eine konsistente Kommunikation zwischen Server und Client zu gewährleisten.
 
 \section{Klassendiagramm}
 \begin{center}
-    \includegraphics[width=\textwidth]{UML.png}
+    \includegraphics[width=0.5\textwidth]{UML.png}
     \label{fig:uml}
 \end{center}
 
