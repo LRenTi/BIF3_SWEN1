@@ -1,17 +1,18 @@
-using System.Security;
+/*using System.Security;
 using System.Security.Authentication;
 using BCrypt.Net;
+using MTCG.Security;
 
 namespace MTCG;
 /// <summary>This class represents a user.</summary>
-public sealed class User
+public sealed class UserOld
 {
     /// <summary>Currently holds the system users.</summary>
     /// <remarks>Is to be removed by database implementation later.</remarks>
     private static Dictionary<string, User> _Users = new();
 
     /// <summary>Creates a new instance of this class.</summary>
-    private User()
+    private UserOld()
     { }
 
     /// <summary>Gets the user name.</summary>
@@ -57,7 +58,7 @@ public sealed class User
     /// <exception cref="AuthenticationException">Thrown when the token is invalid.</exception>
     public void Save(string token)
     {
-        (bool Success, User? User) auth = Token.Authenticate(token);
+        (bool Success, User? User) auth = Session.Authenticate(token);
         if (auth.Success)
         {
             if (auth.User!.UserName != UserName)
@@ -90,7 +91,7 @@ public sealed class User
         User user = new()
         {
             UserName = userName,
-            PasswordHash = HashPassword(password),
+            //PasswordHash = HashPassword(password),
             FullName = fullName,
             EMail = eMail
         };
@@ -118,7 +119,7 @@ public sealed class User
 
             if (VerifyPassword(password, user.PasswordHash))
             {
-                return (true, Token._CreateTokenFor(user));
+                return (true, Session._CreateTokenFor(user));
             }
         }
 
@@ -171,3 +172,4 @@ public sealed class User
         Deck = selectedCards;
     }
 }
+*/

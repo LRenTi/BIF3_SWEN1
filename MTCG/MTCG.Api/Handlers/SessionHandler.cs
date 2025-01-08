@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Text.Json;
 using MTCG.Models;
+using MTCG.Security;
 
 namespace MTCG;
 
@@ -15,30 +16,45 @@ namespace MTCG;
 /// </summary>
 public class SessionHandler : Handler
 {
-    [Route("POST", "sessions")]
-    private (int Status, JsonObject? Reply) CreateSession(HttpSvrEventArgs e)
-    {
-        try
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // public static methods                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <summary>Creates a session.</summary>
+    /// <param name="e">Event arguments.</param>
+    /// <returns>Returns TRUE.</returns>
+        
+        [Route("POST", "sessions")]
+        public static bool _CreateSession(HttpSvrEventArgs e)
         {
-            var userDto = JsonSerializer.Deserialize<UserDto>(e.Payload);
-            if (userDto == null) 
-                return BadRequest("Invalid request.");
+            JsonObject? reply = new JsonObject() { ["success"] = false, ["message"] = "Invalid request." };
+            int status = HttpStatusCode.BAD_REQUEST;                            // initialize response
 
-            var (Success, Token) = User.Logon(
-                userDto.Username,
-                userDto.Password
-            );
-
-            if (Success)
+            try
             {
-                return TokenOk(Token, "User logged in successfully.");
+                JsonNode? json = JsonNode.Parse(e.Payload);                     // parse payload
+                if(json != null)
+                {
+                    Session ses = Session.Create((string?) json["username"] ?? "", (string?) json["password"] ?? "");
+
+                    if(ses.Valid)
+                    {
+                        status = HttpStatusCode.OK;
+                        reply = new JsonObject() { ["success"] = true,
+                                                   ["token"] = ses.Token };
+                    }
+                    else
+                    {
+                        reply = new JsonObject() { ["success"] = false,
+                                                   ["message"] = "Invalid user name or password" };
+                    }
+                }
+            }
+            catch(Exception) 
+            {                                                                   // handle unexpected exception
+                reply = new JsonObject() { ["success"] = false, ["message"] = "Unexpected error." };
             }
 
-            return Unauthorized("Invalid username/password.");
+            e.Reply(status, reply?.ToJsonString());                             // send response
+            return true;
         }
-        catch (Exception)
-        {
-            return BadRequest("Invalid request.");
-        }
-    }
 }
