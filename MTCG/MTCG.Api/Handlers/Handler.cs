@@ -48,25 +48,77 @@ namespace MTCG;
         
         public virtual bool Handle(HttpSvrEventArgs e)
         {
+            // Methodensuche via Reflection
             var methods = GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                 .Where(m => m.GetCustomAttribute<RouteAttribute>() != null);
+
+            // Request-Pfad aufräumen (ohne führenden/trailing /)
+            var normalizedPath = e.Path.Trim('/').Trim();
 
             foreach (var method in methods)
             {
                 var route = method.GetCustomAttribute<RouteAttribute>()!;
-                var normalizedPath = e.Path.TrimEnd('/', ' ', '\t').TrimStart('/');
-                
-                if (route.Path == normalizedPath && route.Method == e.Method)
+        
+                // Methode (GET, POST, etc.) vergleichen
+                if (!string.Equals(route.Method, e.Method, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Versuche Platzhalter-Abgleich
+                var placeholders = MatchRoute(route.Path, normalizedPath);
+                if (placeholders != null) // => Erfolg
                 {
-                    var result = ((int Status, JsonObject? Reply))method.Invoke(this, new[] { e })!;
+                    // Du kannst nun placeholders in e.RouteParams o.Ä. speichern:
+                    e.RouteParams.Clear();
+                    foreach (var kvp in placeholders)
+                    {
+                        e.RouteParams[kvp.Key] = kvp.Value;
+                    }
+
+                    // Methode aufrufen
+                    var result = ((int Status, JsonObject? Reply))method.Invoke(this, new object[] { e })!;
                     e.Reply(result.Status, result.Reply?.ToJsonString());
                     return true;
                 }
             }
 
+            // Keine passende Route gefunden
             return false;
         }
+        
+        private Dictionary<string, string>? MatchRoute(string routeDefinition, string requestPath)
+        {
+            var routeParts = routeDefinition.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var requestParts = requestPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
+            // Gleiche Anzahl Segmente erforderlich
+            if (routeParts.Length != requestParts.Length)
+                return null;
+
+            var placeholders = new Dictionary<string, string>();
+            for (int i = 0; i < routeParts.Length; i++)
+            {
+                string patternSegment = routeParts[i];
+                string requestSegment = requestParts[i];
+
+                if (patternSegment.StartsWith("{") && patternSegment.EndsWith("}"))
+                {
+                    // => Platzhalter, z.B. "{username}"
+                    string key = patternSegment[1..^1]; // "username"
+                    placeholders[key] = requestSegment; // z.B. "testuser"
+                }
+                else
+                {
+                    // Statisches Segment, muss exakt übereinstimmen
+                    if (!string.Equals(patternSegment, requestSegment, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return null; // passt nicht
+                    }
+                }
+            }
+
+            return placeholders;
+        }
+        
         protected (int Status, JsonObject? Reply) Ok<T>(T data) => 
             (HttpStatusCode.OK, JsonSerializer.SerializeToNode(ApiResponseDto<T>.SuccessResponse(data))?.AsObject());
 

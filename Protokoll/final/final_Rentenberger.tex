@@ -1,0 +1,132 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage{graphicx}
+\usepackage[top=3cm, margin=1cm, bottom=3cm]{geometry}
+\usepackage{hyperref}
+
+\title{MTCG: Intermediate Protokoll}
+\author{Rentenberger Lorenz}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Projektübersicht}
+Das Monster Trading Card Game (MTCG) ist eine REST-API Implementierung eines Kartenspiels. Die Anwendung ermöglicht Benutzern, sich zu registrieren, Karten zu sammeln, Decks zusammenzustellen und gegen andere Spieler anzutreten.
+
+\subsection{GIT}
+Link zum Github-Repository: \url{https://github.com/LRenTi/BIF3_SWEN1}
+
+\section{Unique Features}
+Winrate wird berechnet und angezeigt im Scoreboard. Die Winrate eines Benutzers wird im Scoreboard angezeigt und gibt das Verhältnis der gewonnenen zu den verlorenen Spielen an. Sie wird berechnet, indem die Anzahl der gewonnenen Spiele durch die Anzahl der verlorenen Spiele geteilt wird:
+\[
+\textrm{Winrate} = \frac{\textrm{Wins}}{\textrm{Losses}}
+\]
+
+Diese Kennzahl bietet einen schnellen Überblick über die Leistung eines Benutzers im Vergleich zu anderen Spielern. Eine höhere Winrate deutet auf eine bessere Erfolgsquote in den Kämpfen hin.
+
+\section{Architektur und Design}
+Die Architektur der Anwendung basiert auf einem mehrschichtigen Ansatz. Die API-Schicht (MTCG.Api) übernimmt die Bearbeitung von HTTP-Requests und das Routing der Endpunkte. Die Core-Schicht (MTCG.Core) enthält die Geschäftslogik und alle zentralen Entitäten des Spiels. Die Data-Schicht (MTCG.Data) enthält die Datenbank und die Repositorys. Diese Trennung ermöglicht eine klare Struktur und erleichtert zukünftige Erweiterungen.
+
+\section{Battle-Logik im BattleHandler}
+
+Der \texttt{BattleHandler} ist verantwortlich für die Durchführung von Kämpfen zwischen zwei Benutzern in der Anwendung. Die Hauptkomponenten der Battle-Logik sind wie folgt:
+
+\begin{itemize}
+    \item \textbf{StartBattle:} Diese Methode initiiert einen Kampf. Wenn ein Benutzer einen Kampf starten möchte, wird überprüft, ob ein anderer Benutzer bereits in der Warteschlange ist. Falls nicht, wird der Benutzer in die Warteschlange gesetzt. Andernfalls wird der Kampf zwischen dem wartenden Benutzer und dem neuen Herausforderer gestartet.
+
+    \item \textbf{DoBattle:} Diese Methode führt den eigentlichen Kampf durch. Der Kampf besteht aus maximal 100 Runden, in denen Karten der beiden Benutzer gegeneinander antreten. Die Karten werden zufällig ausgewählt, und der Schaden wird basierend auf den Karteneigenschaften und Elementen berechnet.
+
+    \item \textbf{Spezielle Interaktionen:} Bestimmte Karteninteraktionen haben spezielle Regeln, z.B.:
+    \begin{itemize}
+        \item \texttt{Goblin} verliert immer gegen \texttt{Dragon}.
+        \item \texttt{Wizard} gewinnt immer gegen \texttt{Ork}.
+        \item \texttt{Knight} verliert gegen \texttt{Water Spell}.
+        \item \texttt{Kraken} ist immun gegen Zaubersprüche.
+        \item \texttt{Fire Elves} können \texttt{Dragon} ausweichen.
+    \end{itemize}
+
+    \item \textbf{Kampfergebnis:} Der Benutzer, der die meisten Runden gewinnt, wird zum Sieger erklärt. Der Sieger erhält eine Erhöhung seines Elo-Ratings und seiner Siegstatistik, während der Verlierer eine Verringerung seines Elo-Ratings erfährt.
+\end{itemize}
+
+Diese Logik stellt sicher, dass die Kämpfe dynamisch und strategisch sind, indem sie sowohl auf Zufall als auch auf spezifische Karteninteraktionen setzen.
+
+\section{API Endpunkte}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Methode} & \textbf{Beschreibung} \\ \hline
+        \textbf{GET /cards} & Ruft alle verfügbaren Karten ab. \\ \hline
+        \textbf{POST /cards} & Fügt eine neue Karte hinzu. \\ \hline
+        \textbf{GET /cards/me} & Ruft die eigenen Karten ab. \\ \hline
+        \textbf{POST /deck} & Fügt eine Karte zu einem Deck hinzu. \\ \hline
+        \textbf{DELETE /deck} & Entfernt eine Karte aus einem Deck. \\ \hline
+        \textbf{GET /deck} & Ruft das Deck eines Benutzers ab. \\ \hline
+        \textbf{PUT /deck} & Definiert das Deck eines Benutzers. \\ \hline
+        \textbf{GET /battles} & Startet einen Kampf zwischen zwei Benutzern. \\ \hline
+        \textbf{GET /scoreboard} & Ruft das Scoreboard mit den Benutzerstatistiken ab. \\ \hline
+        \textbf{POST /market} & Erstellt ein neues Angebot auf dem Markt. \\ \hline
+        \textbf{GET /market} & Ruft alle Marktangebote ab. \\ \hline
+        \textbf{PUT /market/\{offerId\}} & Aktualisiert ein Marktangebot mit der angegebenen ID. \\ \hline
+        \textbf{POST /purchase/\{packageId\}} & Kauft ein Kartenpaket mit der angegebenen ID. \\ \hline
+        \textbf{GET /package} & Ruft alle verfügbaren Kartenpakete ab. \\ \hline
+        \textbf{POST /package} & Erstellt ein neues Kartenpaket. \\ \hline
+        \textbf{POST /sessions} & Erstellt eine neue Benutzersitzung (Login). \\ \hline
+        \textbf{GET /users/\{username\}} & Ruft die Informationen eines bestimmten Benutzers ab. \\ \hline
+        \textbf{POST /users} & Erstellt einen neuen Benutzer. \\ \hline
+    \end{tabular}
+    \caption{API-Endpunkte}
+    \label{tab:api_endpoints}
+\end{table}
+
+\section{Begründung der Testfälle}
+
+Die Implementierung von Unit-Tests in der Softwareentwicklung ist entscheidend, um die Qualität und Zuverlässigkeit des Codes sicherzustellen. In diesem Projekt wurden die Tests aus mehreren Gründen eingesetzt:
+
+\begin{itemize}
+    \item \textbf{Verifikation der Funktionalität:} Die Tests überprüfen, ob die grundlegenden Funktionen der Anwendung, wie die Erstellung und Authentifizierung von Benutzern, korrekt implementiert sind. Dies stellt sicher, dass die Kernfunktionen wie erwartet arbeiten.
+
+    \item \textbf{Sicherstellung der Geschäftslogik:} Die Tests validieren die Geschäftslogik, insbesondere die Kampfmechanismen und die Berechnung von Spielstatistiken wie Elo-Ratings und Winrates. Dies ist wichtig, um die Integrität der Spielregeln zu gewährleisten.
+
+    \item \textbf{Erkennung von Regressionen:} Durch das regelmäßige Ausführen der Tests kann sichergestellt werden, dass neue Änderungen oder Erweiterungen im Code keine bestehenden Funktionen beeinträchtigen. Dies hilft, unerwünschte Seiteneffekte zu vermeiden.
+
+    \item \textbf{Dokumentation des Verhaltens:} Die Tests dienen als lebendige Dokumentation des erwarteten Verhaltens der Anwendung. Sie bieten eine klare Spezifikation dessen, was der Code leisten soll, und können als Referenz für zukünftige Entwicklungen genutzt werden.
+
+    \item \textbf{Erhöhung der Codequalität:} Durch das Schreiben von Tests wird der Entwickler dazu angeregt, den Code modularer und wartbarer zu gestalten. Dies führt zu einer besseren Struktur und Lesbarkeit des Codes.
+
+\end{itemize}
+
+Insgesamt tragen die Tests dazu bei, die Zuverlässigkeit und Stabilität der Anwendung zu erhöhen, indem sie sicherstellen, dass alle Komponenten wie vorgesehen funktionieren und dass Änderungen im Code keine negativen Auswirkungen haben.
+
+\section{Lessons Learned}
+
+Im Verlauf dieses Projekts habe ich wertvolle Erfahrungen und Kenntnisse in verschiedenen Bereichen der Softwareentwicklung gesammelt:
+
+\begin{itemize}
+    \item \textbf{Verwendung eines HTTP-Servers:} Ich habe gelernt, wie man einen HTTP-Server einrichtet und konfiguriert, um Anfragen zu empfangen und zu verarbeiten. Dies beinhaltete das Verständnis der HTTP-Protokolle und der effizienten Verwaltung von Anfragen und Antworten.
+
+    \item \textbf{Erstellung der API und der Endpunkte:} Die Entwicklung einer RESTful API war eine zentrale Komponente des Projekts. Ich habe gelernt, wie man Endpunkte definiert, um verschiedene Funktionen der Anwendung bereitzustellen, und wie man diese Endpunkte testet und dokumentiert.
+
+    \item \textbf{Verwendung von PostgreSQL:} Die Integration von PostgreSQL als Datenbanklösung hat mir Einblicke in die Verwaltung und Abfrage von Datenbanken gegeben. Ich habe gelernt, wie man Datenbanktabellen erstellt, Daten speichert und abruft sowie wie man SQL-Abfragen optimiert.
+
+\end{itemize}
+
+Diese Erfahrungen haben mein Verständnis für die Entwicklung moderner Webanwendungen vertieft und mir geholfen, meine Fähigkeiten in der Backend-Entwicklung zu erweitern.
+
+\section{Zeitaufwand}
+
+Im Rahmen dieses Projekts habe ich die folgenden Zeitaufwände verzeichnet:
+
+\begin{itemize}
+    \item \textbf{Projektentwicklung:} Die Entwicklung des gesamten Projekts hat insgesamt etwa 50 Stunden in Anspruch genommen. Dies umfasste die Planung, Implementierung und das Testen der Anwendung.
+
+    \item \textbf{Dokumentation:} Für die Erstellung der Projektdokumentation habe ich etwa 2 Stunden benötigt. Dies beinhaltete das Schreiben und Formatieren der Dokumentation in LaTeX.
+
+    \item \textbf{Curl-Skript:} Die Erstellung und das Testen des Curl-Skripts zur Automatisierung von API-Anfragen haben weitere 1,5 Stunden in Anspruch genommen.
+
+\end{itemize}
+
+\end{document}

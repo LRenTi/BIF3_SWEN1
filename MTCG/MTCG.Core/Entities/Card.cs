@@ -1,62 +1,35 @@
-namespace MTCG;
+namespace MTCG.Core.Entities;
 
-public class Card
-{
-    /// <summary>Eindeutige ID der Karte.</summary>
-    public Guid Id { get; private set; } = Guid.NewGuid();
-
-    /// <summary>Name der Karte.</summary>
-    public string Name { get; private set; }
-
-    /// <summary>Schadenswert der Karte.</summary>
-    public int Damage { get; private set; }
-
-    /// <summary>Elementtyp der Karte.</summary>
-    public ElementType ElementType { get; private set; }
-
-    /// <summary>Art der Karte (Monster oder Zauber).</summary>
-    public CardType CardType { get; private set; }
-
-    public Card(string name, int damage, ElementType elementType, CardType cardType)
+    public abstract class Card
     {
-        Name = name;
-        Damage = damage;
-        ElementType = elementType;
-        CardType = cardType;
-    }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Damage { get; set; }
+        public string Element { get; set; }
+        public string CardType { get; set; }
 
-    /// <summary>Berechnet den effektiven Schaden gegen eine andere Karte.</summary>
-    public virtual int CalculateEffectiveDamage(Card opponent)
-    {
-        // Spezialregeln prüfen
-        if (IsSpecialRule(opponent))
-            return 0;
-
-        // Wenn mindestens eine Zauberkarte beteiligt ist
-        if (CardType == CardType.Spell || opponent.CardType == CardType.Spell)
+        protected Card(int id, string name, int damage, string element, string cardType)
         {
-            return ElementType switch
-            {
-                ElementType.Water when opponent.ElementType == ElementType.Fire => Damage * 2,
-                ElementType.Fire when opponent.ElementType == ElementType.Normal => Damage * 2,
-                ElementType.Normal when opponent.ElementType == ElementType.Water => Damage * 2,
-                ElementType.Fire when opponent.ElementType == ElementType.Water => Damage / 2,
-                ElementType.Normal when opponent.ElementType == ElementType.Fire => Damage / 2,
-                ElementType.Water when opponent.ElementType == ElementType.Normal => Damage / 2,
-                _ => Damage
-            };
+            Id = id;
+            Name = name;
+            Damage = damage;
+            Element = element;
+            CardType = cardType;
         }
-
-        return Damage; // Bei reinen Monster-Kämpfen
     }
 
-    private bool IsSpecialRule(Card opponent)
+    public class MonsterCard : Card
     {
-        return
-            (Name.Contains("Goblin") && opponent.Name.Contains("Dragon")) ||
-            (Name.Contains("Ork") && opponent.Name.Contains("Wizzard")) ||
-            (Name.Contains("Knight") && opponent.CardType == CardType.Spell && opponent.ElementType == ElementType.Water) ||
-            (opponent.Name.Contains("Kraken") && CardType == CardType.Spell) ||
-            (opponent.Name.Contains("FireElves") && Name.Contains("Dragon"));
+        public MonsterCard(int id, string name, int damage, string element, string cardType)
+            : base(id, name, damage, element, cardType)
+        {
+        }
     }
-} 
+
+    public class SpellCard : Card
+    {
+        public SpellCard(int id, string name, int damage, string element, string cardType)
+            : base(id, name, damage, element, cardType)
+        {
+        }
+    }

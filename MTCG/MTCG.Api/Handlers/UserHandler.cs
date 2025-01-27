@@ -1,6 +1,8 @@
+using System;
 using System.Net;
 using System.Reflection;
 using System.Text.Json.Nodes;
+using MTCG.Core.Entities;
 using System.Text.Json;
 using System.Security;
 using MTCG.Models;
@@ -8,64 +10,86 @@ using MTCG.Security;
 
 namespace MTCG;
 
-/// <summary>
-/// This class handles user-related requests.
-/// </summary>
+
 public class UserHandler : Handler, IHandler
 {
     [Route("POST", "users")]
     private (int Status, JsonObject? Reply) _CreateUser(HttpSvrEventArgs e)
-        {
-            try
-            {
-                JsonNode? json = JsonNode.Parse(e.Payload);                     // parse payload
-                if(json != null)
-                {
-                    User user = new()                                           // create user object
-                    {
-                        UserName = (string?) json["username"] ?? "",
-                        FullName = (string?) json["name"] ?? "",
-                        EMail = (string?) json["email"] ?? ""
-                    };
-                    user.BeginEdit(Session.From(e));                            // edit user with session
-
-                    user.IsAdmin = (bool?) json["admin"] ?? false;              // set admin flag                    
-                    user.Save((string?) json["password"] ?? "12345");           // save user object
-                    
-                    user.EndEdit();                                             // end editing
-                    
-                    return Ok("User created.");
-                }
-                
-                return BadRequest(e.Payload);
-            }
-            catch(SecurityException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                return BadRequest("Unexpected error: " + ex);
-            }
-            
-        }
-    
-    [Route("GET","users/me")]
-    private (int Status, JsonObject? Reply) GetUserProfile(HttpSvrEventArgs e)
     {
-        /*var (Success, User) = .Authenticate(e);
-        
-        if (!Success)
-        {
-            return Unauthorized();
-        }*/
-        Console.WriteLine("Start");
+        JsonObject reply = new() { ["success"] = false, ["message"] = "Ungültige Anfrage." };
+        int status = HttpStatusCode.BAD_REQUEST;
 
-        var userDto = new UserDto
+        try
         {
-            Username = "test"
-        };
+            JsonNode? json = JsonNode.Parse(e.Payload);
+            if (json != null)
+            {
+                string username = (string)json["username"]!;
+                string password = (string)json["password"]!;
 
-        return Ok(userDto);
+                User.Register(username, password);
+
+                return Ok("User created.");
+            }
+            else
+            {
+                return BadRequest("Invalid payload.");
+            }
+        }
+        catch (SecurityException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest("Unexpected error: " + ex);
+        }
+
     }
+
+    [Route("GET", "users/{username}")]
+    private (int status, JsonObject? Reply) _QueryUser(HttpSvrEventArgs e)
+    {
+        try
+        {
+            
+            if (!e.RouteParams.TryGetValue("username", out var username))
+                return BadRequest("No username provided?");
+
+            (bool Success, User? User) auth = Token.Authenticate(e);
+            
+            JsonObject? reply = null;
+
+            if (!auth.Success)
+            {
+                return Unauthorized();
+            }
+
+            User? user = User.Get(username);
+            if (user == null)
+            {
+                reply["message"] = "User not found!";
+                return (404, reply);
+                
+            }
+            else
+            {
+                JsonObject json = new()
+                {
+                    ["username"] = user.Username,
+                    ["coins"] = user.Coins,
+                    ["elo"] = user.Elo,
+                    ["wins"] = user.Wins,
+                    ["losses"] = user.Losses,
+                    ["games"] = user.Games,
+                };
+                return (HttpStatusCode.OK, json);
+            }
+        }
+        catch (Exception ex)
+        {
+            return BadRequest("Something went wrong: " + ex.Message);
+        }
+    }
+    
 }

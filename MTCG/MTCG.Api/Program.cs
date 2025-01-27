@@ -1,5 +1,5 @@
 ﻿using System;
-using MTCG.Data.Base;
+using MTCG.Data;
 
 namespace MTCG;
     /// <summary>This class contains the main entry point of the application.</summary>

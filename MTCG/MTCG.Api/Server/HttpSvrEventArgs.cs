@@ -10,6 +10,8 @@ namespace MTCG;
         /// <summary>TCP client.</summary>
         protected TcpClient _Client;
         
+        public Dictionary<string, string> RouteParams { get; } = new();
+        
         /// <summary>Creates a new instance of this class.</summary>
         /// <param name="client">TCP client.</param>
         /// <param name="plainMessage">Plain HTTP message.</param>
