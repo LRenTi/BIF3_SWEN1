@@ -14,7 +14,7 @@ namespace MTCG;
 public class UserHandler : Handler, IHandler
 {
     [Route("POST", "users")]
-    private (int Status, JsonObject? Reply) _CreateUser(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> _CreateUser(HttpSvrEventArgs e)
     {
         JsonObject reply = new() { ["success"] = false, ["message"] = "Ungültige Anfrage." };
         int status = HttpStatusCode.BAD_REQUEST;
@@ -27,7 +27,7 @@ public class UserHandler : Handler, IHandler
                 string username = (string)json["username"]!;
                 string password = (string)json["password"]!;
 
-                User.Register(username, password);
+                await User.Register(username, password);
 
                 return Ok("User created.");
             }
@@ -48,7 +48,7 @@ public class UserHandler : Handler, IHandler
     }
 
     [Route("GET", "users/{username}")]
-    private (int status, JsonObject? Reply) _QueryUser(HttpSvrEventArgs e)
+    private async Task<(int status, JsonObject? Reply)> _QueryUser(HttpSvrEventArgs e)
     {
         try
         {
@@ -56,7 +56,7 @@ public class UserHandler : Handler, IHandler
             if (!e.RouteParams.TryGetValue("username", out var username))
                 return BadRequest("No username provided?");
 
-            (bool Success, User? User) auth = Token.Authenticate(e);
+            (bool Success, User? User) auth = await Token.Authenticate(e);
             
             JsonObject? reply = null;
 

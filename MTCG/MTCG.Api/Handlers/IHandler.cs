@@ -9,5 +9,5 @@ namespace MTCG;
         /// <param name="e">Event arguments.</param>
         /// <returns>Returns TRUE if the request was handled by this instance,
         ///          otherwise returns FALSE.</returns>
-        public bool Handle(HttpSvrEventArgs e);
+        public Task<bool> Handle(HttpSvrEventArgs e);
     }

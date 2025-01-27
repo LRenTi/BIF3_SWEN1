@@ -28,18 +28,18 @@ public class Unittest
     }
 
     [Fact]
-    public void TestUserAuthenticationSuccess()
+    public async Task TestUserAuthenticationSuccess()
     {
         User.Register("authuser", "authpassword");
-        var result = User.Authenticate("authuser", "authpassword");
+        var result = await User.Authenticate("authuser", "authpassword");
         Assert.True(result.Success);
         Assert.NotNull(result.User);
     }
 
     [Fact]
-    public void TestUserAuthenticationFailure()
+    public async Task TestUserAuthenticationFailure()
     {
-        var result = User.Authenticate("nonexistent", "wrongpassword");
+        var result = await User.Authenticate("nonexistent", "wrongpassword");
         Assert.False(result.Success);
         Assert.Null(result.User);
     }

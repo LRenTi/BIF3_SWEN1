@@ -8,15 +8,15 @@ namespace MTCG.Security
     {
         private static Dictionary<string, User> _tokens = new();
 
-        public static string GenerateToken(User user)
+        public static async Task<string> GenerateToken(User user)
         {
             
-            string randomToken = Guid.NewGuid().ToString();
+            string randomToken = await Task.FromResult(Guid.NewGuid().ToString());
             _tokens[randomToken] = user;
             return randomToken;
         }
 
-        public static (bool Success, User? User) Authenticate(string token)
+        public static async Task<(bool Success, User? User)> Authenticate(string token)
         {
             if (_tokens.TryGetValue(token, out User? user))
             {
@@ -25,7 +25,7 @@ namespace MTCG.Security
             return (false, null);
         }
 
-        public static (bool Success, User? User) Authenticate(HttpSvrEventArgs e)
+        public static async Task<(bool Success, User? User)> Authenticate(HttpSvrEventArgs e)
         {
             foreach (var header in e.Headers)
             {
@@ -33,7 +33,7 @@ namespace MTCG.Security
                     header.Value.StartsWith("Bearer "))
                 {
                     string token = header.Value.Substring(7).Trim();
-                    return Authenticate(token);
+                    return await Authenticate(token);
                 }
             }
             return (false, null);

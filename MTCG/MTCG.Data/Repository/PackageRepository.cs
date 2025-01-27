@@ -9,11 +9,7 @@ namespace MTCG.Data.Repository;
 public static class PackageRepository
 {
     
-    /// <summary>
-    /// Erzeugt ein Package (mit ID und Preis) und legt dessen 5 Karten in der DB an.
-    /// Speichert die Zuordnung in packages_cards.
-    /// </summary>
-    public static void CreatePackage(int? packageId, List<Card> cards, int price)
+    public static async Task<bool> CreatePackage(int? packageId, List<Card> cards, int price)
     {
         if (cards.Count != 5)
         {
@@ -30,7 +26,7 @@ public static class PackageRepository
             {
                 cmd.Parameters.AddWithValue("pid", packageId);
                 cmd.Parameters.AddWithValue("p", price);
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
 
             foreach (var c in cards)
@@ -57,23 +53,21 @@ public static class PackageRepository
                 {
                     cmd.Parameters.AddWithValue("pid", packageId);
                     cmd.Parameters.AddWithValue("cid", c.Id);
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
 
             trans.Commit();
+            return true;
         }
         catch
         {
             trans.Rollback();
-            throw;
+            return false;
         }
     }
 
-    /// <summary>
-    /// Kauf eines Packages durch einen Benutzer.
-    /// </summary>
-    public static bool PurchasePackage(string packageIdString, User user)
+    public static async Task<bool> PurchasePackage(string packageIdString, User user)
     {
         if (!int.TryParse(packageIdString, out int packageId))
         {
@@ -84,7 +78,7 @@ public static class PackageRepository
         using var trans = conn.BeginTransaction();
         try
         {
-            int? price = GetPackagePrice(packageId, conn, trans);
+            int? price = await GetPackagePrice(packageId, conn, trans);
             if (price == null || user.Coins < price)
             {
                 return false;
@@ -95,8 +89,8 @@ public static class PackageRepository
                 @"SELECT card_id FROM packages_cards WHERE package_id = @pid;", conn, trans))
             {
                 cmd.Parameters.AddWithValue("pid", packageId);
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
                     cardIds.Add(reader.GetInt32(0));
                 }
@@ -116,7 +110,7 @@ public static class PackageRepository
             {
                 cmd.Parameters.AddWithValue("c", newCoins);
                 cmd.Parameters.AddWithValue("uname", user.Username);
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
             user.Coins = newCoins;
 
@@ -129,7 +123,7 @@ public static class PackageRepository
             {
                 cmd.Parameters.AddWithValue("uname", user.Username);
                 cmd.Parameters.AddWithValue("pid", packageId);
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
             }
 
             trans.Commit();
@@ -144,23 +138,17 @@ public static class PackageRepository
         }
     }
 
-    /// <summary>
-    /// Retrieves the price of a package.
-    /// </summary>
-    public static int? GetPackagePrice(int packageId, NpgsqlConnection conn, NpgsqlTransaction trans)
+    public static async Task<int?> GetPackagePrice(int packageId, NpgsqlConnection conn, NpgsqlTransaction trans)
     {
         using var cmd = new NpgsqlCommand(
             @"SELECT price FROM packages WHERE package_id = @pid;", conn, trans);
         cmd.Parameters.AddWithValue("pid", packageId);
-        object? oprice = cmd.ExecuteScalar();
+        object? oprice = await cmd.ExecuteScalarAsync();
         
         return oprice != null ? Convert.ToInt32(oprice) : null;
     }
 
-    /// <summary>
-    /// Retrieves all packages with their prices and associated cards.
-    /// </summary>
-    public static List<Package> GetAllPackagesWithCards()
+    public static async Task<List<Package>> GetAllPackagesWithCards()
     {
         var packages = new List<Package>();
 
@@ -171,8 +159,8 @@ public static class PackageRepository
               JOIN packages_cards pc ON p.package_id = pc.package_id
               JOIN cards c ON pc.card_id = c.card_id;", conn);
 
-        using var reader = cmd.ExecuteReader();
-        while (reader.Read())
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
             int packageId = reader.GetInt32(0);
             decimal price = reader.GetDecimal(1);

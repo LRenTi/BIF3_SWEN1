@@ -13,7 +13,7 @@ namespace MTCG;
     public class PackageHandler : Handler, IHandler
     {
         [Route("POST", "package")]
-        private (int Status, JsonObject? Reply) CreatePackage(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> CreatePackage(HttpSvrEventArgs e)
         {
             JsonObject reply = new() { ["success"] = false, ["message"] = "Ungültige Anfrage." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -21,7 +21,7 @@ namespace MTCG;
             try
             {
                 // Authentifizieren
-                (bool Success, User? User) auth = Token.Authenticate(e);
+                (bool Success, User? User) auth = await Token.Authenticate(e);
                 if (!auth.Success || auth.User == null || auth.User.IsAdmin == false)
                 {
                     return Unauthorized();
@@ -90,7 +90,7 @@ namespace MTCG;
                                 cardList.Add(newCard);
                             }
                             
-                            PackageRepository.CreatePackage(packageId, cardList, price);
+                            await PackageRepository.CreatePackage(packageId, cardList, price);
                         }
 
                         status = HttpStatusCode.OK;
@@ -113,9 +113,9 @@ namespace MTCG;
         /// Retrieves all packages with their prices and returns them as a JSON object.
         /// </summary>
         [Route("GET", "package")]
-        private (int Status, JsonObject? Reply) GetAllPackages(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> GetAllPackages(HttpSvrEventArgs e)
         {
-            var packages = PackageRepository.GetAllPackagesWithCards();
+            var packages = await PackageRepository.GetAllPackagesWithCards();
             var packageInfo = new JsonArray();
 
             foreach (var package in packages)
@@ -146,7 +146,7 @@ namespace MTCG;
         }
 
         [Route("POST", "purchase/{packageId}")]
-        private (int Status, JsonObject? Reply) PurchasePackage(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> PurchasePackage(HttpSvrEventArgs e)
         {
             JsonObject reply = new() { ["success"] = false, ["message"] = "Fehler beim Kauf des Pakets." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -154,7 +154,7 @@ namespace MTCG;
             try
             {
                 // Authentifizieren
-                (bool Success, User? User) auth = Token.Authenticate(e);
+                (bool Success, User? User) auth = await Token.Authenticate(e);
                 if (!auth.Success || auth.User == null)
                 {
                     return Unauthorized();
@@ -166,7 +166,7 @@ namespace MTCG;
                     return (status, reply);
                 }
                 
-                bool success = PackageRepository.PurchasePackage(packageId, auth.User);
+                bool success = await PackageRepository.PurchasePackage(packageId, auth.User);
 
                 if (success)
                 {

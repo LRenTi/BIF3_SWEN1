@@ -9,20 +9,20 @@ namespace MTCG;
 public class CardHandler : Handler, IHandler
 {
     [Route("GET", "cards")]
-    private (int Status, JsonObject? Reply) GetAllCards(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> GetAllCards(HttpSvrEventArgs e)
     {
         try
         {
             JsonObject reply = new() { ["success"] = false };
 
-            (bool Success, User? User) auth = Token.Authenticate(e);
+            (bool Success, User? User) auth = await Token.Authenticate(e);
             if (!auth.Success || auth.User == null)
             {
                 return Unauthorized();
             }
             else
             {
-                var cards = CardRepository.GetAllCards();
+                var cards = await CardRepository.GetAllCards();
 
                 if (!cards.Any())
                 {
@@ -57,9 +57,9 @@ public class CardHandler : Handler, IHandler
     }
 
     [Route("POST", "cards")]
-    private (int Status, JsonObject? Reply) AddCard(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> AddCard(HttpSvrEventArgs e)
     {
-        (bool Success, User? User) auth = Token.Authenticate(e);
+        (bool Success, User? User) auth = await Token.Authenticate(e);
 
         if (!auth.Success || auth.User.IsAdmin == false)
         {
@@ -88,7 +88,7 @@ public class CardHandler : Handler, IHandler
                 card = new MonsterCard(0, name, damage, element, cardtype);
             }
 
-            CardRepository.AddCard(card);
+            await CardRepository.AddCard(card);
 
             return Ok("Card created.");
         }
@@ -99,21 +99,21 @@ public class CardHandler : Handler, IHandler
     }
 
     [Route("GET", "cards/me")]
-    private (int Status, JsonObject? Reply) GetCards(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> GetCards(HttpSvrEventArgs e)
     {
         JsonObject reply = new() { ["success"] = false, ["message"] = "" };
         int status = HttpStatusCode.BAD_REQUEST;
 
         try
         {
-            (bool Success, User? User) auth = Token.Authenticate(e);
+            (bool Success, User? User) auth = await Token.Authenticate(e);
             if (!auth.Success || auth.User == null)
             {
                 return Unauthorized();
             }
             else
             {
-                var userCards = CardRepository.GetCardsByUser(auth.User.Username);
+                var userCards = await CardRepository.GetCardsByUser(auth.User.Username);
 
                 status = HttpStatusCode.OK;
                 reply["success"] = true;
@@ -149,9 +149,9 @@ public class CardHandler : Handler, IHandler
     }
 
     [Route("POST", "deck")]
-    private (int Status, JsonObject? Reply) AddCardToDeck(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> AddCardToDeck(HttpSvrEventArgs e)
     {
-        (bool Success, User? User) auth = Token.Authenticate(e);
+        (bool Success, User? User) auth = await Token.Authenticate(e);
         if (!auth.Success || auth.User == null)
         {
             return Unauthorized();
@@ -164,7 +164,7 @@ public class CardHandler : Handler, IHandler
         }
 
         int cardId = (int)json["cardId"]!;
-        bool success = CardRepository.AddCardToDeck(auth.User.Username, cardId);
+        bool success = await CardRepository.AddCardToDeck(auth.User.Username, cardId);
 
         if (success)
         {
@@ -177,9 +177,9 @@ public class CardHandler : Handler, IHandler
     }
 
     [Route("DELETE", "deck")]
-    private (int Status, JsonObject? Reply) RemoveCardFromDeck(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> RemoveCardFromDeck(HttpSvrEventArgs e)
     {
-        (bool Success, User? User) auth = Token.Authenticate(e);
+        (bool Success, User? User) auth = await Token.Authenticate(e);
         if (!auth.Success || auth.User == null)
         {
             return Unauthorized();
@@ -192,7 +192,7 @@ public class CardHandler : Handler, IHandler
         }
 
         int cardId = (int)json["cardId"]!;
-        bool success = CardRepository.RemoveCardFromDeck(auth.User.Username, cardId);
+        bool success = await CardRepository.RemoveCardFromDeck(auth.User.Username, cardId);
 
         if (success)
         {
@@ -205,15 +205,15 @@ public class CardHandler : Handler, IHandler
     }
 
     [Route("GET", "deck")]
-    private (int Status, JsonObject? Reply) GetDeckCards(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> GetDeckCards(HttpSvrEventArgs e)
     {
-        (bool Success, User? User) auth = Token.Authenticate(e);
+        (bool Success, User? User) auth = await Token.Authenticate(e);
         if (!auth.Success || auth.User == null)
         {
             return Unauthorized();
         }
 
-        var deckCards = CardRepository.GetDeckCards(auth.User.Username);
+        var deckCards = await CardRepository.GetDeckCards(auth.User.Username);
 
         JsonObject reply = new() { ["success"] = true };
         var cardArray = new JsonArray();
@@ -236,7 +236,7 @@ public class CardHandler : Handler, IHandler
     }
 
     [Route("PUT", "deck")]
-    private (int Status, JsonObject? Reply) ConfigureDeck(HttpSvrEventArgs e)
+    private async Task<(int Status, JsonObject? Reply)> ConfigureDeck(HttpSvrEventArgs e)
         {
             JsonObject reply = new() { ["success"] = false, ["message"] = "Invalid request." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -244,7 +244,7 @@ public class CardHandler : Handler, IHandler
             try
             {
                 // Authenticate user
-                (bool Success, User? User) auth = Token.Authenticate(e);
+                (bool Success, User? User) auth = await Token.Authenticate(e);
                 if (!auth.Success || auth.User == null)
                 {
                     return Unauthorized();
@@ -264,7 +264,7 @@ public class CardHandler : Handler, IHandler
                     }
 
                     // Use repository to configure deck
-                    CardRepository.ConfigureDeck(auth.User.Username, cardIds);
+                    await CardRepository.ConfigureDeck(auth.User.Username, cardIds);
 
                     status = HttpStatusCode.OK;
                     reply["success"] = true;

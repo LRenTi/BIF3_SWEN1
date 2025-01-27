@@ -35,18 +35,17 @@ namespace MTCG;
         
         /// <summary>Handles an incoming HTTP request.</summary>
         /// <param name="e">Event arguments.</param>
-        public static void HandleEvent(HttpSvrEventArgs e)
+        public static async Task HandleEventAsync(HttpSvrEventArgs e)
         {
             _Handlers ??= _GetHandlers();
 
             foreach(IHandler i in _Handlers)
             {
-                if(i.Handle(e)) return;
+                if(await i.Handle(e)) return;
             }
             e.Reply(HttpStatusCode.BAD_REQUEST);
         }
-        
-        public virtual bool Handle(HttpSvrEventArgs e)
+        public virtual async Task<bool> Handle(HttpSvrEventArgs e)
         {
             // Methodensuche via Reflection
             var methods = GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
@@ -74,14 +73,14 @@ namespace MTCG;
                         e.RouteParams[kvp.Key] = kvp.Value;
                     }
 
-                    // Methode aufrufen
-                    var result = ((int Status, JsonObject? Reply))method.Invoke(this, new object[] { e })!;
+                    // Methode asynchron aufrufen
+                    var resultTask = (Task<(int Status, JsonObject? Reply)>)method.Invoke(this, new object[] { e });
+                    var result = await resultTask;
                     e.Reply(result.Status, result.Reply?.ToJsonString());
                     return true;
                 }
             }
 
-            // Keine passende Route gefunden
             return false;
         }
         

@@ -8,7 +8,7 @@ namespace MTCG.Data.Repository;
         /// <summary>
         /// Registriert einen neuen User in der Datenbank.
         /// </summary>
-        public static void RegisterUser(string username, string password)
+        public static async Task<bool> RegisterUser(string username, string password)
         {
             using var conn = Connection.GetConnection();
 
@@ -24,7 +24,8 @@ namespace MTCG.Data.Repository;
 
             try
             {
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
+                return true;
             }
             catch (PostgresException pex)
             {
@@ -86,7 +87,7 @@ namespace MTCG.Data.Repository;
         /// <summary>
         /// Authentifiziert User (username/password).
         /// </summary>
-        public static (bool Success, User? User) AuthenticateUser(string username, string password)
+        public static async Task<(bool Success, User? User)> AuthenticateUser(string username, string password)
         {
             using var conn = Connection.GetConnection();
             using var cmd = new NpgsqlCommand(
@@ -95,8 +96,8 @@ namespace MTCG.Data.Repository;
                   WHERE username = @uname;", conn);
             cmd.Parameters.AddWithValue("uname", username);
 
-            using var reader = cmd.ExecuteReader();
-            if (reader.Read())
+            using var reader = await cmd.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
             {
                 string dbUser = reader.GetString(0);
                 string dbHashedPwd = reader.GetString(1);
@@ -158,15 +159,15 @@ namespace MTCG.Data.Repository;
         /// <summary>
         /// Gibt eine Liste aller User zurück.
         /// </summary>
-        public static List<User> GetAllUsers()
+        public static async Task<List<User>> GetAllUsers()
         {
             var list = new List<User>();
             using var conn = Connection.GetConnection();
             using var cmd = new NpgsqlCommand(
                 @"SELECT username, password, coins, elo, is_admin, losses, wins, games FROM users;", conn);
 
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 var uname = reader.GetString(0);
                 var pwd = reader.GetString(1);

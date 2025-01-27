@@ -19,17 +19,16 @@ namespace MTCG;
         
         /// <summary>Application entry point.</summary>
         /// <param name="args">Command line arguments.</param>
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Server started!");
             HttpSvr svr = new();
-            svr.Incoming += Svr_Incoming; //(sender, e) => { Handler.HandleEvent(e); };
+            svr.Incoming += async (sender, e) => await Svr_Incoming(sender, e); //(sender, e) => { Handler.HandleEvent(e); };
 
-            svr.Run();
+            await svr.Run();
         }
-        
-        private static void Svr_Incoming(object sender, HttpSvrEventArgs e)
+        private static async Task Svr_Incoming(object sender, HttpSvrEventArgs e)
         {
-            Handler.HandleEvent(e);
+            Handler.HandleEventAsync(e);
         }
     }

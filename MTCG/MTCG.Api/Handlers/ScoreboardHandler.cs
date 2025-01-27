@@ -12,10 +12,10 @@ namespace MTCG;
     {
 
         [Route("GET", "scoreboard")]
-        private (int Status, JsonObject? Reply) GetScoreboard(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> GetScoreboard(HttpSvrEventArgs e)
         {
 
-            var users = UserRepository.GetAllUsers() ?? new List<User>();
+            var users = await UserRepository.GetAllUsers() ?? new List<User>();
 
             var sorted = users.OrderByDescending(u => u.Elo).ToList();
             JsonObject reply = new();

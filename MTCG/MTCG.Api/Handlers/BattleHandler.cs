@@ -21,7 +21,7 @@ namespace MTCG;
         /// <param name="e">HttpSvrEventArgs</param>
         /// <returns>Status and Reply</returns>
         [Route("POST", "battles")]
-        private (int Status, JsonObject? Reply) StartBattle(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> StartBattle(HttpSvrEventArgs e)
         {
             JsonObject reply = new() { ["success"] = false, ["message"] = "Something went wrong." };
             int status = HttpStatusCode.BAD_REQUEST;
@@ -29,7 +29,7 @@ namespace MTCG;
             Console.WriteLine("Starting Battle");
             try
             {
-                var auth = Token.Authenticate(e);
+                var auth = await Token.Authenticate(e);
                 User? attacker = auth.User;
 
                 if (!auth.Success || attacker == null)
@@ -39,7 +39,7 @@ namespace MTCG;
                 else
                 {
 
-                    var attackerDeck = CardRepository.GetDeckCardIds(attacker.Username);
+                    var attackerDeck = await CardRepository.GetDeckCardIds(attacker.Username);
                     if (attackerDeck.Count > 4)
                         throw new Exception($"User {attacker.Username} has {attackerDeck.Count} Cards in the Deck (it's not allowed to have more than 4 cards).");
                     
@@ -55,11 +55,11 @@ namespace MTCG;
                             var defender = WaitingUser;
                             WaitingUser = null;
 
-                            var defenderDeck = CardRepository.GetDeckCardIds(defender.Username);
+                            var defenderDeck = await CardRepository.GetDeckCardIds(defender.Username);
                             if (defenderDeck.Count > 4)
                                 throw new Exception($"Enemy {defender.Username} has {defenderDeck.Count} more cards in the deck than allowed (max 4).");
 
-                            (var logLines, var outcome) = DoBattle(attacker, defender);
+                            (var logLines, var outcome) = await DoBattle(attacker, defender);
                             status = HttpStatusCode.OK;
                             reply["success"] = true;
                             reply["message"] = "BATTLE STARTED!";
@@ -83,12 +83,12 @@ namespace MTCG;
         /// Die Person, die am Ende mehr Runden gewinnt, gewinnt den Kampf.
         /// Während des Spiels verliert der Verlierer seine Karten.
         /// </summary>
-        private (List<string> Log, string Outcome) DoBattle(User attacker, User defender)
+        private async Task<(List<string> Log, string Outcome)> DoBattle(User attacker, User defender)
         {
             var battleLog = new List<string>();
 
-            var attackerDeckIds = CardRepository.GetDeckCardIds(attacker.Username);
-            var defenderDeckIds = CardRepository.GetDeckCardIds(defender.Username);
+            var attackerDeckIds = await CardRepository.GetDeckCardIds(attacker.Username);
+            var defenderDeckIds = await CardRepository.GetDeckCardIds(defender.Username);
 
             if (attackerDeckIds.Count == 0)
                 throw new Exception($"User {attacker.Username} doesn't have any cards in the deck.");
@@ -99,7 +99,7 @@ namespace MTCG;
 
             foreach (var cid in attackerDeckIds)
             {
-                var c = CardRepository.GetCardById(cid);
+                var c = await CardRepository.GetCardById(cid);
                 if (c != null)
                 {
                     allCardStates.Add(new CardState
@@ -113,7 +113,7 @@ namespace MTCG;
 
             foreach (var cid in defenderDeckIds)
             {
-                var c = CardRepository.GetCardById(cid);
+                var c = await CardRepository.GetCardById(cid);
                 if (c != null)
                 {
                     allCardStates.Add(new CardState

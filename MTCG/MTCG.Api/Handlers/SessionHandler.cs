@@ -10,7 +10,7 @@ namespace MTCG;
     {
         
         [Route("POST", "sessions")]
-        private (int Status, JsonObject? Reply) _CreateSession(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> _CreateSession(HttpSvrEventArgs e)
         {
             JsonObject? reply = null;
 
@@ -22,11 +22,11 @@ namespace MTCG;
                     string username = (string)json["username"]!;
                     string password = (string)json["password"]!;
 
-                    (bool success, User? user) = User.Authenticate(username, password);
+                    (bool success, User? user) = await User.Authenticate(username, password);
 
                     if (success)
                     {
-                        string token = Security.Token.GenerateToken(user!);
+                        string token = await Security.Token.GenerateToken(user!);
                         
                             reply = new JsonObject()
                             {

@@ -20,7 +20,7 @@ namespace MTCG;
         } = false;
         
         /// <summary>Runs the server.</summary>
-        public void Run()
+        public async Task Run()
         {
             if(Active) return;
 
@@ -37,7 +37,7 @@ namespace MTCG;
                 
                 while(client.GetStream().DataAvailable || string.IsNullOrWhiteSpace(data))
                 {
-                    int n = client.GetStream().Read(buf, 0, buf.Length);
+                    int n = await client.GetStream().ReadAsync(buf, 0, buf.Length);
                     data += Encoding.ASCII.GetString(buf, 0, n);
                 }
 

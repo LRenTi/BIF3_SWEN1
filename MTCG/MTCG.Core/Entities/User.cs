@@ -22,17 +22,17 @@ using System.Collections.Generic;
            /// <summary>
            /// Registriert den User in der DB (Wrap auf das UserRepository).
            /// </summary>
-           public static void Register(string username, string password)
+           public static async Task Register(string username, string password)
            {
-               UserRepository.RegisterUser(username, password);
+               await UserRepository.RegisterUser(username, password);
            }
    
            /// <summary>
            /// Authentifiziert den User (Wrap auf das UserRepository).
            /// </summary>
-           public static (bool Success, User? User) Authenticate(string username, string password)
+           public static async Task<(bool Success, User? User)> Authenticate(string username, string password)
            {
-               return UserRepository.AuthenticateUser(username, password);
+               return await UserRepository.AuthenticateUser(username, password);
            }
    
            /// <summary>

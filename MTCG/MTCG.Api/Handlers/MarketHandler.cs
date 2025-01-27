@@ -9,12 +9,12 @@ namespace MTCG;
     public class MarketHandler : Handler, IHandler
     {
         [Route("POST", "market")]
-        private (int Status, JsonObject? Reply) CreateTradeOffer(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> CreateTradeOffer(HttpSvrEventArgs e)
         {
             try
             {
 
-                (bool Success, User? User) auth = Token.Authenticate(e);
+                (bool Success, User? User) auth = await Token.Authenticate(e);
                 if (!auth.Success || auth.User == null)
                 {
                     return Unauthorized();
@@ -26,7 +26,7 @@ namespace MTCG;
                     int offeredCardId = json["offeredCardId"]!.GetValue<int>();
                     int requestedCardId = json["requestedCardId"]!.GetValue<int>();
 
-                    MarketRepository.CreateTradeOffer(auth.User.Username, offeredCardId, requestedCardId);
+                    await MarketRepository.CreateTradeOffer(auth.User.Username, offeredCardId, requestedCardId);
 
                     JsonObject reply = new();
                     reply["success"] = true;
@@ -48,11 +48,11 @@ namespace MTCG;
         }
 
         [Route("GET", "market")]
-        private (int Status, JsonObject? Reply) GetAllTradeOffers(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> GetAllTradeOffers(HttpSvrEventArgs e)
         {
             try
             {
-                var offers = MarketRepository.GetAllTradeOffers();
+                var offers = await MarketRepository.GetAllTradeOffers();
                 JsonArray offerArray = new();
 
                 foreach (var offer in offers)
@@ -77,13 +77,13 @@ namespace MTCG;
         }
 
         [Route("PUT", "market/{offerId}")]
-        private (int Status, JsonObject? Reply) AcceptTradeOffer(HttpSvrEventArgs e)
+        private async Task<(int Status, JsonObject? Reply)> AcceptTradeOffer(HttpSvrEventArgs e)
         {
             try
             {
                 JsonObject reply = new();
                 
-                (bool Success, User? User) auth = Token.Authenticate(e);
+                (bool Success, User? User) auth = await Token.Authenticate(e);
 
                 if (!auth.Success || auth.User == null)
                 {
@@ -96,7 +96,7 @@ namespace MTCG;
                     return (HttpStatusCode.BAD_REQUEST, reply);
                 }
 
-                bool success = MarketRepository.AcceptTradeOffer(int.Parse(offerId), auth.User.Username);
+                bool success = await MarketRepository.AcceptTradeOffer(int.Parse(offerId), auth.User.Username);
                 
                 if (success)
                 {
