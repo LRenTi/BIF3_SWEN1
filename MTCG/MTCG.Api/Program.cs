@@ -29,6 +29,6 @@ namespace MTCG;
         }
         private static async Task Svr_Incoming(object sender, HttpSvrEventArgs e)
         {
-            Handler.HandleEventAsync(e);
+            await Handler.HandleEventAsync(e);
         }
     }
